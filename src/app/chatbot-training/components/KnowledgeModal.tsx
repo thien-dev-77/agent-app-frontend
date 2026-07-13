@@ -2,9 +2,9 @@
 
 import { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { X, Upload, FileText, Plus, FolderOpen, Trash2, Database, Image as ImageIcon } from 'lucide-react';
+import { X, Upload, FileText, Plus, FolderOpen, Trash2, Database, Image as ImageIcon, Pencil, Check, XCircle } from 'lucide-react';
 import { TrainingCategory, TrainingStats, TrainingPhrase, TrainingFAQ, TrainingScenario } from '@/types';
-import { uploadKnowledgeFile, addKnowledgeText, createTrainingCategory, deleteTrainingCategory, uploadFile } from '@/lib/api';
+import { uploadKnowledgeFile, addKnowledgeText, createTrainingCategory, deleteTrainingCategory, uploadFile, updateTrainingPhrase, updateTrainingFAQ, updateTrainingScenario, deleteTrainingPhrase, deleteTrainingFAQ, deleteTrainingScenario } from '@/lib/api';
 
 interface Props {
   open: boolean;
@@ -34,6 +34,12 @@ export default function KnowledgeModal({ open, onClose, categories, stats, onRef
   const [imgPreview, setImgPreview] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const imgFileRef = useRef<HTMLInputElement>(null);
+
+  // Edit states
+  const [editingPhrase, setEditingPhrase] = useState<TrainingPhrase | null>(null);
+  const [editingFaq, setEditingFaq] = useState<TrainingFAQ | null>(null);
+  const [editingScenario, setEditingScenario] = useState<TrainingScenario | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
 
   if (!open) return null;
 
@@ -150,6 +156,67 @@ export default function KnowledgeModal({ open, onClose, categories, stats, onRef
   const handleDeleteCategory = async (id: string) => {
     if (!confirm('Xóa danh mục?')) return;
     try { await deleteTrainingCategory(id); toast.success('Đã xóa'); onRefresh(); } catch { toast.error('Lỗi'); }
+  };
+
+  // Edit handlers
+  const handleEditPhrase = (p: TrainingPhrase) => {
+    setEditingPhrase(p);
+    setEditForm({ intent: p.intent, user_message: p.user_message, bot_response: p.bot_response });
+  };
+
+  const handleSavePhrase = async () => {
+    if (!editingPhrase) return;
+    try {
+      await updateTrainingPhrase(editingPhrase.id, editForm);
+      toast.success('Đã cập nhật');
+      setEditingPhrase(null);
+      onRefresh();
+    } catch { toast.error('Lỗi cập nhật'); }
+  };
+
+  const handleDeletePhrase = async (id: string) => {
+    if (!confirm('Xóa mẫu câu này?')) return;
+    try { await deleteTrainingPhrase(id); toast.success('Đã xóa'); onRefresh(); } catch { toast.error('Lỗi'); }
+  };
+
+  const handleEditFaq = (f: TrainingFAQ) => {
+    setEditingFaq(f);
+    setEditForm({ question: f.question, answer: f.answer });
+  };
+
+  const handleSaveFaq = async () => {
+    if (!editingFaq) return;
+    try {
+      await updateTrainingFAQ(editingFaq.id, editForm);
+      toast.success('Đã cập nhật');
+      setEditingFaq(null);
+      onRefresh();
+    } catch { toast.error('Lỗi cập nhật'); }
+  };
+
+  const handleDeleteFaq = async (id: string) => {
+    if (!confirm('Xóa FAQ này?')) return;
+    try { await deleteTrainingFAQ(id); toast.success('Đã xóa'); onRefresh(); } catch { toast.error('Lỗi'); }
+  };
+
+  const handleEditScenario = (s: TrainingScenario) => {
+    setEditingScenario(s);
+    setEditForm({ title: s.title, trigger_condition: s.trigger_condition, description: s.description || '' });
+  };
+
+  const handleSaveScenario = async () => {
+    if (!editingScenario) return;
+    try {
+      await updateTrainingScenario(editingScenario.id, editForm);
+      toast.success('Đã cập nhật');
+      setEditingScenario(null);
+      onRefresh();
+    } catch { toast.error('Lỗi cập nhật'); }
+  };
+
+  const handleDeleteScenario = async (id: string) => {
+    if (!confirm('Xóa tình huống này?')) return;
+    try { await deleteTrainingScenario(id); toast.success('Đã xóa'); onRefresh(); } catch { toast.error('Lỗi'); }
   };
 
   const tabStyle = (active: boolean) => ({
@@ -320,9 +387,29 @@ export default function KnowledgeModal({ open, onClose, categories, stats, onRef
                           </p>
                           <div className="space-y-1.5">
                             {filteredScenarios.map((s) => (
-                              <div key={s.id} className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                                <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{s.title}</p>
-                                <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{s.trigger_condition}</p>
+                              <div key={s.id} className="p-3 rounded-lg group" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                                {editingScenario?.id === s.id ? (
+                                  <div className="space-y-2">
+                                    <input type="text" value={editForm.title || ''} onChange={e => setEditForm({...editForm, title: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none" style={inputStyle} placeholder="Tiêu đề" />
+                                    <input type="text" value={editForm.trigger_condition || ''} onChange={e => setEditForm({...editForm, trigger_condition: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none" style={inputStyle} placeholder="Điều kiện" />
+                                    <textarea value={editForm.description || ''} onChange={e => setEditForm({...editForm, description: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none resize-none" style={inputStyle} rows={3} placeholder="Mô tả" />
+                                    <div className="flex gap-1">
+                                      <button onClick={handleSaveScenario} className="p-1 rounded" style={{ color: 'var(--accent-green)' }}><Check className="w-4 h-4" /></button>
+                                      <button onClick={() => setEditingScenario(null)} className="p-1 rounded" style={{ color: 'var(--text-tertiary)' }}><XCircle className="w-4 h-4" /></button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <p className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{s.title}</p>
+                                      <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-tertiary)' }}>{s.trigger_condition}</p>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                      <button onClick={() => handleEditScenario(s)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--text-tertiary)' }}><Pencil className="w-3 h-3" /></button>
+                                      <button onClick={() => handleDeleteScenario(s.id)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--accent-red)' }}><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -334,9 +421,28 @@ export default function KnowledgeModal({ open, onClose, categories, stats, onRef
                           <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-tertiary)' }}>FAQ</p>
                           <div className="space-y-1.5">
                             {filteredFaqs.map((f) => (
-                              <div key={f.id} className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                                <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{f.question}</p>
-                                <p className="text-[11px] mt-1 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{f.answer}</p>
+                              <div key={f.id} className="p-3 rounded-lg group" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                                {editingFaq?.id === f.id ? (
+                                  <div className="space-y-2">
+                                    <input type="text" value={editForm.question || ''} onChange={e => setEditForm({...editForm, question: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none" style={inputStyle} placeholder="Câu hỏi" />
+                                    <textarea value={editForm.answer || ''} onChange={e => setEditForm({...editForm, answer: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none resize-none" style={inputStyle} rows={3} placeholder="Câu trả lời" />
+                                    <div className="flex gap-1">
+                                      <button onClick={handleSaveFaq} className="p-1 rounded" style={{ color: 'var(--accent-green)' }}><Check className="w-4 h-4" /></button>
+                                      <button onClick={() => setEditingFaq(null)} className="p-1 rounded" style={{ color: 'var(--text-tertiary)' }}><XCircle className="w-4 h-4" /></button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{f.question}</p>
+                                      <p className="text-[11px] mt-1 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{f.answer}</p>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                      <button onClick={() => handleEditFaq(f)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--text-tertiary)' }}><Pencil className="w-3 h-3" /></button>
+                                      <button onClick={() => handleDeleteFaq(f.id)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--accent-red)' }}><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -348,12 +454,30 @@ export default function KnowledgeModal({ open, onClose, categories, stats, onRef
                           <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-tertiary)' }}>Mẫu câu</p>
                           <div className="space-y-1.5">
                             {filteredPhrases.map((p) => (
-                              <div key={p.id} className="p-3 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                                <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(79, 140, 255, 0.2)', color: 'var(--accent)' }}>
-                                  {p.intent}
-                                </span>
-                                <p className="text-xs mt-1" style={{ color: 'var(--text-primary)' }}>{p.user_message}</p>
-                                <p className="text-[11px] mt-1" style={{ color: 'var(--text-secondary)' }}>{p.bot_response}</p>
+                              <div key={p.id} className="p-3 rounded-lg group" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
+                                {editingPhrase?.id === p.id ? (
+                                  <div className="space-y-2">
+                                    <input type="text" value={editForm.intent || ''} onChange={e => setEditForm({...editForm, intent: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none" style={inputStyle} placeholder="Intent" />
+                                    <input type="text" value={editForm.user_message || ''} onChange={e => setEditForm({...editForm, user_message: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none" style={inputStyle} placeholder="Câu user" />
+                                    <textarea value={editForm.bot_response || ''} onChange={e => setEditForm({...editForm, bot_response: e.target.value})} className="w-full px-2 py-1 rounded text-xs outline-none resize-none" style={inputStyle} rows={3} placeholder="Câu trả lời bot" />
+                                    <div className="flex gap-1">
+                                      <button onClick={handleSavePhrase} className="p-1 rounded" style={{ color: 'var(--accent-green)' }}><Check className="w-4 h-4" /></button>
+                                      <button onClick={() => setEditingPhrase(null)} className="p-1 rounded" style={{ color: 'var(--text-tertiary)' }}><XCircle className="w-4 h-4" /></button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <span className="text-[10px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(79, 140, 255, 0.2)', color: 'var(--accent)' }}>{p.intent}</span>
+                                      <p className="text-xs mt-1" style={{ color: 'var(--text-primary)' }}>{p.user_message}</p>
+                                      <p className="text-[11px] mt-1" style={{ color: 'var(--text-secondary)' }}>{p.bot_response}</p>
+                                    </div>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                      <button onClick={() => handleEditPhrase(p)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--text-tertiary)' }}><Pencil className="w-3 h-3" /></button>
+                                      <button onClick={() => handleDeletePhrase(p.id)} className="p-1 rounded hover:bg-[var(--bg-hover)]" style={{ color: 'var(--accent-red)' }}><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
