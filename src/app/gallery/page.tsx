@@ -39,7 +39,7 @@ export default function GalleryPage() {
     
     try {
       const res = await fetch(
-        `https://promptsref.com/api/home/showcase-works?limit=24&offset=${currentOffset}&sort=latest&model=gpt-image`
+        `/api/gallery?limit=24&offset=${currentOffset}&sort=latest&model=gpt-image`
       );
       const data: ApiResponse = await res.json();
       
