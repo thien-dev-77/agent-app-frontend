@@ -79,14 +79,13 @@ Bạn là 1 chuyên gia tư vấn niềng răng tại Dr.Wondersmile. Bạn thâ
   ]);
   const [autoSuggest, setAutoSuggest] = useState(true);
 
-  // Idle messages state
-  const [idleEnabled, setIdleEnabled] = useState(true);
-  const [idleMessages, setIdleMessages] = useState([
-    { delay: 30, message: "😊 Anh/chị ơi, em thấy mình đang tìm hiểu về dịch vụ nha khoa. Hiện tại bên em đang có **ưu đãi giảm 20%** cho khách hàng mới đặt lịch trong tuần này. Anh/chị có muốn em tư vấn thêm không ạ?" },
-    { delay: 60, message: "🎁 Ngoài ra, nếu anh/chị đặt lịch hẹn ngay hôm nay, bên em sẽ **tặng thêm gói kiểm tra răng miệng miễn phí** (trị giá 500.000đ). Anh/chị có muốn em hỗ trợ đặt lịch không ạ?" },
-    { delay: 90, message: "📅 Em có thể giúp anh/chị đặt lịch hẹn ngay bây giờ. Anh/chị cho em xin:\n- Họ tên\n- Số điện thoại\n- Thời gian mong muốn\n\nĐội ngũ bác sĩ sẽ liên hệ xác nhận ngay ạ! 🦷" },
-    { delay: 120, message: "💬 Anh/chị có thắc mắc gì về dịch vụ hay bảng giá không ạ? Em sẵn sàng hỗ trợ 24/7. Hoặc anh/chị có thể để lại số điện thoại để bác sĩ tư vấn trực tiếp nhé!" },
-  ]);
+  // Idle settings state (simplified)
+  const [idleSettings, setIdleSettings] = useState({
+    enabled: true,
+    delaySeconds: 30,
+    maxReminders: 3,
+    context: 'Giảm 20% cho khách mới, tặng gói kiểm tra răng miệng miễn phí 500k, hotline: 0909.xxx.xxx'
+  });
 
   // Modal states
   const [showKnowledgeModal, setShowKnowledgeModal] = useState(false);
@@ -157,8 +156,9 @@ Bạn là 1 chuyên gia tư vấn niềng răng tại Dr.Wondersmile. Bạn thâ
     setAutoSuggest(bot.settings?.auto_suggest || false);
     setOpeningQuestions(bot.settings?.opening_questions || ['Niềng răng mất bao lâu?', 'Chi phí bao nhiêu?', 'Có đau không?']);
     setSegments(bot.settings?.segments || 4);
-    setIdleEnabled(bot.settings?.idle_enabled !== false);
-    if (bot.settings?.idle_messages) setIdleMessages(bot.settings.idle_messages);
+    if (bot.settings?.idle_settings) {
+      setIdleSettings(bot.settings.idle_settings);
+    }
   };
 
   const handleSaveBot = async () => {
@@ -172,8 +172,7 @@ Bạn là 1 chuyên gia tư vấn niềng răng tại Dr.Wondersmile. Bạn thâ
           auto_suggest: autoSuggest, 
           segments, 
           opening_questions: openingQuestions,
-          idle_enabled: idleEnabled,
-          idle_messages: idleMessages,
+          idle_settings: idleSettings,
         } 
       });
       toast.success('Đã lưu chatbot');
@@ -348,10 +347,8 @@ Bạn là 1 chuyên gia tư vấn niềng răng tại Dr.Wondersmile. Bạn thâ
             onOpenKnowledge={() => setShowKnowledgeModal(true)}
             phrases={phrases}
             faqs={faqs}
-            idleEnabled={idleEnabled}
-            onIdleEnabledChange={setIdleEnabled}
-            idleMessages={idleMessages}
-            onIdleMessagesChange={setIdleMessages}
+            idleSettings={idleSettings}
+            onIdleSettingsChange={setIdleSettings}
           />
         </div>
 
@@ -361,8 +358,7 @@ Bạn là 1 chuyên gia tư vấn niềng răng tại Dr.Wondersmile. Bạn thâ
             promptContent={promptContent}
             model={model}
             autoSuggest={autoSuggest}
-            idleEnabled={idleEnabled}
-            idleMessages={idleMessages}
+            idleSettings={idleSettings}
           />
         </div>
       </div>

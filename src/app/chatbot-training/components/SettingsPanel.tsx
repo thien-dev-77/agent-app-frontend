@@ -15,6 +15,13 @@ export interface IdleMessage {
   message: string;
 }
 
+export interface IdleSettings {
+  enabled: boolean;
+  delaySeconds: number; // Thời gian chờ chung
+  maxReminders: number; // Số lần nhắc tối đa
+  context: string; // Context bổ sung cho AI
+}
+
 interface Props {
   model: string;
   onModelChange: (v: string) => void;
@@ -32,11 +39,9 @@ interface Props {
   onOpenKnowledge?: () => void;
   phrases?: any[];
   faqs?: any[];
-  // Idle messages settings
-  idleEnabled?: boolean;
-  onIdleEnabledChange?: (v: boolean) => void;
-  idleMessages?: IdleMessage[];
-  onIdleMessagesChange?: (v: IdleMessage[]) => void;
+  // Idle settings (simplified)
+  idleSettings?: IdleSettings;
+  onIdleSettingsChange?: (v: IdleSettings) => void;
 }
 
 // Toggle Switch Component
@@ -63,7 +68,7 @@ export default function SettingsPanel({
   model, onModelChange, debugMode, onDebugChange, segments, onSegmentsChange,
   openingQuestions, onOpeningQuestionsChange, autoSuggest, onAutoSuggestChange,
   stats, categories, onRefresh, onOpenKnowledge, phrases = [], faqs = [],
-  idleEnabled = true, onIdleEnabledChange, idleMessages = [], onIdleMessagesChange,
+  idleSettings = { enabled: true, delaySeconds: 30, maxReminders: 3, context: '' }, onIdleSettingsChange,
 }: Props) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     knowledge: true,
@@ -383,83 +388,70 @@ export default function SettingsPanel({
             )}
             <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Nhắc khi im lặng</span>
           </div>
-          <Toggle checked={idleEnabled} onChange={(v) => onIdleEnabledChange?.(v)} />
+          <Toggle checked={idleSettings.enabled} onChange={(v) => onIdleSettingsChange?.({ ...idleSettings, enabled: v })} />
         </button>
-        {expanded.idleMessages && idleEnabled && (
+        {expanded.idleMessages && idleSettings.enabled && (
           <div className="px-4 pb-4 space-y-3">
             <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-              Tự động gửi tin nhắn khi khách không trả lời sau một khoảng thời gian
+              AI sẽ tự đọc context cuộc hội thoại và gửi tin nhắn nhắc nhở phù hợp (ưu đãi, đặt lịch...)
             </p>
             
-            {idleMessages.map((item, idx) => (
-              <div 
-                key={idx} 
-                className="p-3 rounded-lg space-y-2"
-                style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="w-3.5 h-3.5" style={{ color: 'var(--accent)' }} />
-                    <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>
-                      Tin nhắn {idx + 1}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const newMessages = idleMessages.filter((_, i) => i !== idx);
-                      onIdleMessagesChange?.(newMessages);
-                    }}
-                    className="p-1 transition hover:text-red-400"
-                    style={{ color: 'var(--text-tertiary)' }}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                
+            <div 
+              className="p-3 rounded-lg space-y-3"
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}
+            >
+              {/* Thời gian chờ */}
+              <div>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--text-secondary)' }}>
+                  Thời gian chờ giữa các lần nhắc
+                </label>
                 <div className="flex items-center gap-2">
-                  <Clock className="w-3 h-3" style={{ color: 'var(--text-tertiary)' }} />
-                  <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>Sau</span>
+                  <Clock className="w-3.5 h-3.5" style={{ color: 'var(--text-tertiary)' }} />
                   <input
                     type="number"
-                    value={item.delay}
-                    onChange={(e) => {
-                      const newMessages = [...idleMessages];
-                      newMessages[idx] = { ...item, delay: parseInt(e.target.value) || 30 };
-                      onIdleMessagesChange?.(newMessages);
-                    }}
-                    className="w-16 px-2 py-1 rounded text-xs text-center outline-none"
+                    value={idleSettings.delaySeconds}
+                    onChange={(e) => onIdleSettingsChange?.({ ...idleSettings, delaySeconds: parseInt(e.target.value) || 30 })}
+                    className="w-20 px-2 py-1.5 rounded text-sm text-center outline-none"
                     style={inputStyle}
                     min={10}
-                    max={600}
+                    max={300}
                   />
-                  <span className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>giây</span>
+                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>giây</span>
                 </div>
-                
+              </div>
+
+              {/* Số lần nhắc tối đa */}
+              <div>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--text-secondary)' }}>
+                  Số lần nhắc tối đa
+                </label>
+                <select
+                  value={idleSettings.maxReminders}
+                  onChange={(e) => onIdleSettingsChange?.({ ...idleSettings, maxReminders: parseInt(e.target.value) })}
+                  className="w-full px-2.5 py-1.5 rounded-lg text-sm outline-none"
+                  style={inputStyle}
+                >
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>{n} lần</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Context bổ sung */}
+              <div>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--text-secondary)' }}>
+                  Ưu đãi / Thông tin bổ sung (AI sẽ dùng để nhắc)
+                </label>
                 <textarea
-                  value={item.message}
-                  onChange={(e) => {
-                    const newMessages = [...idleMessages];
-                    newMessages[idx] = { ...item, message: e.target.value };
-                    onIdleMessagesChange?.(newMessages);
-                  }}
-                  placeholder="Nội dung tin nhắn..."
+                  value={idleSettings.context || ''}
+                  onChange={(e) => onIdleSettingsChange?.({ ...idleSettings, context: e.target.value })}
+                  placeholder="VD: Giảm 20% cho khách mới, tặng gói kiểm tra miễn phí 500k, hotline: 0909..."
                   className="w-full px-2.5 py-2 rounded-lg text-xs outline-none resize-none"
                   style={inputStyle}
                   rows={3}
                 />
               </div>
-            ))}
-            
-            <button
-              onClick={() => {
-                const lastDelay = idleMessages.length > 0 ? idleMessages[idleMessages.length - 1].delay + 30 : 30;
-                onIdleMessagesChange?.([...idleMessages, { delay: lastDelay, message: '' }]);
-              }}
-              className="flex items-center gap-1.5 text-xs font-medium"
-              style={{ color: 'var(--accent)' }}
-            >
-              <Plus className="w-3.5 h-3.5" /> Thêm tin nhắn
-            </button>
+            </div>
           </div>
         )}
       </div>

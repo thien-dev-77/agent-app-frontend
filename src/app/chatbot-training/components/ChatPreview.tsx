@@ -8,6 +8,13 @@ import { chatWithBot, getChatSuggestions } from '@/lib/api';
 // Regex detect image URLs
 const IMAGE_URL_REGEX = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|svg)(?:\?[^\s]*)?)/gi;
 
+export interface IdleSettings {
+  enabled: boolean;
+  delaySeconds: number;
+  maxReminders: number;
+  context: string;
+}
+
 function MessageContent({ content, isUser }: { content: string; isUser: boolean }) {
   const imageUrls = content.match(IMAGE_URL_REGEX);
 
@@ -70,31 +77,10 @@ interface Props {
   promptContent: string;
   model: string;
   autoSuggest?: boolean;
-  idleEnabled?: boolean;
-  idleMessages?: IdleMessageConfig[];
+  idleSettings?: IdleSettings;
 }
 
-// Default idle messages
-const DEFAULT_IDLE_MESSAGES: IdleMessageConfig[] = [
-  {
-    delay: 30,
-    message: "😊 Anh/chị ơi, em thấy mình đang tìm hiểu về dịch vụ nha khoa. Hiện tại bên em đang có **ưu đãi giảm 20%** cho khách hàng mới đặt lịch trong tuần này. Anh/chị có muốn em tư vấn thêm không ạ?"
-  },
-  {
-    delay: 60,
-    message: "🎁 Ngoài ra, nếu anh/chị đặt lịch hẹn ngay hôm nay, bên em sẽ **tặng thêm gói kiểm tra răng miệng miễn phí** (trị giá 500.000đ). Anh/chị có muốn em hỗ trợ đặt lịch không ạ?"
-  },
-  {
-    delay: 90,
-    message: "📅 Em có thể giúp anh/chị đặt lịch hẹn ngay bây giờ. Anh/chị cho em xin:\n- Họ tên\n- Số điện thoại\n- Thời gian mong muốn\n\nĐội ngũ bác sĩ sẽ liên hệ xác nhận ngay ạ! 🦷"
-  },
-  {
-    delay: 120,
-    message: "💬 Anh/chị có thắc mắc gì về dịch vụ hay bảng giá không ạ? Em sẵn sàng hỗ trợ 24/7. Hoặc anh/chị có thể để lại số điện thoại để bác sĩ tư vấn trực tiếp nhé!"
-  }
-];
-
-export default function ChatPreview({ promptContent, model, autoSuggest = false, idleEnabled = true, idleMessages }: Props) {
+export default function ChatPreview({ promptContent, model, autoSuggest = false, idleSettings }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -105,8 +91,38 @@ export default function ChatPreview({ promptContent, model, autoSuggest = false,
   const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
   const idleCountRef = useRef(0);
 
-  // Sử dụng idle messages từ props hoặc default
-  const IDLE_MESSAGES = idleMessages && idleMessages.length > 0 ? idleMessages : DEFAULT_IDLE_MESSAGES;
+  // Default idle settings
+  const defaultIdleSettings: IdleSettings = { enabled: true, delaySeconds: 30, maxReminders: 3, context: '' };
+  const currentIdleSettings = idleSettings || defaultIdleSettings;
+
+  // Generate tin nhắn nhắc bằng AI dựa trên context
+  const generateIdleReminder = async (reminderCount: number): Promise<string> => {
+    const history = messages.map((m) => ({ role: m.role, content: m.content }));
+    
+    // Tạo prompt để AI generate tin nhắn nhắc
+    const reminderPrompt = `[HỆ THỐNG: Khách hàng đã im lặng. Đây là lần nhắc thứ ${reminderCount}/${currentIdleSettings.maxReminders}. 
+Hãy gửi tin nhắn nhắc nhở ngắn gọn, thân thiện để:
+- Lần 1: Hỏi thăm và giới thiệu ưu đãi nếu có
+- Lần 2: Đề nghị hỗ trợ đặt lịch hẹn
+- Lần 3+: Để lại thông tin liên hệ
+
+${currentIdleSettings.context ? `Thông tin ưu đãi/liên hệ: ${currentIdleSettings.context}` : ''}
+
+Chỉ trả lời tin nhắn nhắc, không giải thích.]`;
+    
+    try {
+      const { reply } = await chatWithBot({ message: reminderPrompt, history });
+      return reply;
+    } catch {
+      // Fallback message nếu API lỗi
+      const fallbacks = [
+        "😊 Anh/chị ơi, em có thể hỗ trợ gì thêm không ạ?",
+        "📅 Anh/chị có muốn em hỗ trợ đặt lịch hẹn không ạ?",
+        "💬 Nếu cần tư vấn thêm, anh/chị cứ nhắn em nhé!"
+      ];
+      return fallbacks[Math.min(reminderCount - 1, fallbacks.length - 1)];
+    }
+  };
 
   // Reset idle timer khi có tin nhắn mới
   const resetIdleTimer = () => {
@@ -114,29 +130,25 @@ export default function ChatPreview({ promptContent, model, autoSuggest = false,
       clearTimeout(idleTimerRef.current);
     }
     idleCountRef.current = 0;
-    if (idleEnabled) {
+    if (currentIdleSettings.enabled) {
       startIdleTimer();
     }
   };
 
   // Bắt đầu đếm thời gian idle
   const startIdleTimer = () => {
-    if (!idleEnabled) return; // Kiểm tra idle có được bật không
-    if (messages.length === 0) return; // Chỉ chạy khi đã có conversation
+    if (!currentIdleSettings.enabled) return;
+    if (messages.length === 0) return;
     
     const currentIdleIndex = idleCountRef.current;
-    if (currentIdleIndex >= IDLE_MESSAGES.length) return; // Đã gửi hết tin idle
+    if (currentIdleIndex >= currentIdleSettings.maxReminders) return;
 
-    const currentDelay = IDLE_MESSAGES[currentIdleIndex].delay * 1000; // Convert to ms
-    const previousDelay = currentIdleIndex > 0 ? IDLE_MESSAGES[currentIdleIndex - 1].delay * 1000 : 0;
-    const delay = currentIdleIndex === 0 ? currentDelay : (currentDelay - previousDelay);
-
-    idleTimerRef.current = setTimeout(() => {
-      // Thêm tin nhắn tự động từ bot
-      setMessages(prev => [...prev, { role: 'assistant', content: IDLE_MESSAGES[currentIdleIndex].message }]);
+    idleTimerRef.current = setTimeout(async () => {
       idleCountRef.current++;
-      startIdleTimer(); // Tiếp tục đếm cho tin tiếp theo
-    }, delay);
+      const reminderMessage = await generateIdleReminder(idleCountRef.current);
+      setMessages(prev => [...prev, { role: 'assistant', content: reminderMessage }]);
+      startIdleTimer();
+    }, currentIdleSettings.delaySeconds * 1000);
   };
 
   // Cleanup timer khi unmount
