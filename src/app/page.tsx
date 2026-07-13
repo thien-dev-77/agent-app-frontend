@@ -43,14 +43,17 @@ const CONNECTION_RULES: Record<string, string[]> = {
 };
 
 const initialNodes: Node[] = [
-  // Prompt Builder - nhập brand, logo, màu, hình tham khảo, mô tả → tạo prompt
-  { id: 'aiprompt-1', type: 'aiprompt', position: { x: 50, y: 100 }, data: {} },
+  // Brand Node - chọn thương hiệu
+  { id: 'brand-1', type: 'brand', position: { x: 50, y: 80 }, data: {} },
+  // Prompt Builder - nhập mô tả, style → tạo prompt
+  { id: 'prompt-1', type: 'prompt', position: { x: 350, y: 100 }, data: {} },
   // Generate Image - tạo ảnh từ prompt
-  { id: 'generate-1', type: 'generate', position: { x: 450, y: 140 }, data: {} },
+  { id: 'generate-1', type: 'generate', position: { x: 700, y: 100 }, data: {} },
 ];
 
 const initialEdges: Edge[] = [
-  { id: 'e1', source: 'aiprompt-1', target: 'generate-1', animated: true },
+  { id: 'e1', source: 'brand-1', target: 'prompt-1', animated: true },
+  { id: 'e2', source: 'prompt-1', target: 'generate-1', animated: true },
 ];
 
 // ═══════════════════════════════════════════════
