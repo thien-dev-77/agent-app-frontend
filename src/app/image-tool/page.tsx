@@ -31,11 +31,6 @@ interface ApiResponse {
 
 const MODELS = [
   { id: 'gpt-image-2', name: 'GPT Image 2', selected: true },
-  { id: 'nano-banana-2-lite', name: 'Nano Banana 2 Lite', selected: false },
-  { id: 'nano-banana-2', name: 'Nano Banana 2', selected: false },
-  { id: 'nano-banana-pro', name: 'Nano Banana Pro', selected: false },
-  { id: 'midjourney', name: 'Midjourney', selected: false },
-  { id: 'seadream-5-pro', name: 'Seedream 5.0 Pro', selected: false },
 ];
 
 const QUALITY_OPTIONS = ['1K', '2K', '4K'];
