@@ -34,12 +34,33 @@ export default function GalleryPage() {
   const [selectedItem, setSelectedItem] = useState<WorkItem | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
 
-  // Navigate to image tool with reference
-  const handleUseAsReference = (item: WorkItem) => {
+  // Navigate to image tool with reference - fetch full prompt first
+  const handleUseAsReference = async (item: WorkItem) => {
+    setLoadingPrompt(true);
+    
+    let fullPrompt = item.prompt_excerpt || '';
+    
+    // Fetch full prompt from API
+    if (item.share_id) {
+      try {
+        const res = await fetch(`/api/gallery/prompt?share_id=${item.share_id}`);
+        const data = await res.json();
+        if (data.prompt) {
+          fullPrompt = data.prompt;
+        }
+      } catch (error) {
+        console.error('Error fetching prompt:', error);
+      }
+    }
+    
+    setLoadingPrompt(false);
+    setSelectedItem(null);
+    
     const params = new URLSearchParams({
       ref: item.output_image_url,
-      prompt: item.prompt_excerpt || '',
+      prompt: fullPrompt,
     });
     router.push(`/image-tool?${params.toString()}`);
   };
@@ -295,11 +316,21 @@ export default function GalleryPage() {
               <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleUseAsReference(selectedItem)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition"
+                  disabled={loadingPrompt}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition disabled:opacity-70"
                   style={{ background: 'var(--accent)', color: 'white' }}
                 >
-                  <Plus className="w-4 h-4" />
-                  Use as Reference
+                  {loadingPrompt ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Đang lấy prompt...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      Use as Reference
+                    </>
+                  )}
                 </button>
                 <div className="flex gap-2">
                   <a
