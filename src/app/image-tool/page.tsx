@@ -439,35 +439,6 @@ function ImageToolContent() {
             </div>
           </div>
 
-          {/* Credits Info */}
-          <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#1a1a1a' }}>
-            <div>
-              <p className="text-xs text-gray-400">Tổng credits</p>
-              <p className="text-sm font-medium text-white">{selectedModels.length * batchCount}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">GPT Image 2</p>
-              <p className="text-sm font-medium text-white">{batchCount}</p>
-            </div>
-          </div>
-
-          {/* Publish Toggle */}
-          <div className="flex items-center justify-between">
-            <label className="text-sm text-gray-300 flex items-center gap-1">
-              Công khai lên thư viện <span className="text-yellow-500">👋</span>
-            </label>
-            <button
-              onClick={() => setPublishToExplore(!publishToExplore)}
-              className={`w-11 h-6 rounded-full transition relative ${
-                publishToExplore ? 'bg-purple-600' : 'bg-gray-700'
-              }`}
-            >
-              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                publishToExplore ? 'translate-x-6' : 'translate-x-1'
-              }`} />
-            </button>
-          </div>
-
           {/* Generate Button */}
           <button
             onClick={handleGenerate}
