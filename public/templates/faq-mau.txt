@@ -1,0 +1,27 @@
+# CÂU HỎI THƯỜNG GẶP - NHA KHOA
+# Format: Mỗi câu hỏi bắt đầu bằng "Q:" và câu trả lời bằng "A:"
+# Hệ thống sẽ tự động nhận diện và import vào FAQ
+
+Q: Niềng răng mất bao lâu?
+A: Thời gian niềng khay trong suốt Dr.Wondersmile từ 6 tháng đến 12 tháng tùy tình trạng. Răng nhẹ (thưa, niềng lại) dưới 6 tháng. Răng khó (hô, móm, khấp khểnh) từ 10-12 tháng.
+
+Q: Chi phí niềng răng bao nhiêu?
+A: Chi phí niềng khay Dr.Wondersmile có 2 gói: Gói cơ bản 33 triệu (răng nhẹ, dưới 6 tháng). Gói chuyên sâu 65 triệu ƯU ĐÃI còn 45 triệu (răng khó, trên 6 tháng). Trọn gói bao gồm khay niềng, mài kẽ, gắn attachment, nhổ răng (nếu có), vệ sinh răng.
+
+Q: Niềng răng có đau không?
+A: Niềng khay trong suốt HẠN CHẾ ĐAU, không cợm cấn khó chịu, không nhiệt lỡ miệng hay hôi miệng. Những ngày đầu đeo khay mới có thể hơi ê nhẹ do răng bắt đầu di chuyển, sau 2-3 ngày sẽ quen.
+
+Q: Có cần nhổ răng khi niềng không?
+A: Niềng khay Dr.Wondersmile HẠN CHẾ NHỔ RĂNG, ưu tiên BẢO TỒN RĂNG THẬT ở mức độ tối đa. Tùy tình trạng răng, bác sĩ sẽ đánh giá khi lên phác đồ 3D.
+
+Q: Có trả góp được không?
+A: Có hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng. Thời gian trả góp từ 6-12 tháng. Thanh toán trước 30-50%, phần còn lại góp hàng tháng.
+
+Q: Nha khoa ở đâu?
+A: Trụ sở chính HCM: 77C Bùi Thị Xuân, Q1. Hà Nội: 99 Giải Phóng, Hai Bà Trưng. Chi nhánh liên kết: Đà Nẵng, Biên Hòa, Bình Dương, Bình Phước, Vĩnh Long.
+
+Q: Thăm khám có mất phí không?
+A: Thăm khám tư vấn hoàn toàn MIỄN PHÍ. Thời gian khoảng 30 phút. Lịch thăm khám từ 9h đến 18h30 tất cả các ngày trong tuần.
+
+Q: Bảo hành như thế nào?
+A: Dr.Wondersmile cam kết niềng THÀNH CÔNG 100% bằng hợp đồng văn bản. Nếu kết quả không đạt so với phác đồ, bảo hành in khay tinh chỉnh MIỄN PHÍ 100%.

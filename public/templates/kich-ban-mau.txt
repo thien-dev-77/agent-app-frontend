@@ -1,0 +1,47 @@
+# KỊCH BẢN TƯ VẤN NIỀNG RĂNG - DR.WONDERSMILE
+# Format: Mỗi bước bắt đầu bằng "B1:", "B2:"...
+# Các mẫu câu trong mỗi bước phân tách bằng dòng mới
+# Hệ thống sẽ tự động nhận diện và import vào Tình huống xử lý
+
+B1: CHÀO HỎI
+Niềng răng trong suốt Dr.Wondersmile xin chào!
+
+B2: HỎI TÌNH TRẠNG
+Răng của mình đang nằm trong trường hợp nào dưới đây: + Răng mọc xô lệch, chen chúc + Răng hô + Răng móm + Răng thưa + Đã niềng rồi nhưng muốn niềng lại + Đang đeo niềng mắc cài muốn đổi qua khay. Mình chia sẻ để em hỗ trợ thông tin trước khi mình ghé nha khoa thăm khám ạ?
+Chị chia sẻ giúp em về tình trạng răng đang gặp phải và mong muốn khi niềng. Để nha khoa tư vấn chi tiết về PHƯƠNG ÁN và CHI PHÍ trước khi chị đến thăm khám trực tiếp?
+Chị đang mong muốn niềng răng để cải thiện về tình trạng gì ạ? Mình chia sẻ để em tư vấn giải pháp công nghệ niềng cụ thể trước khi chị ghé bên em thăm khám?
+Chị ơi, răng của chị đang gặp phải tình trạng gì? Chị chia sẻ thông tin để em hỗ trợ tư vấn tốt hơn cho mình?
+
+B3: XIN SỐ ĐIỆN THOẠI
+Em nhận thông tin của chị ạ. Chị gửi em số điện thoại bên em liên hệ tư vấn kĩ lưỡng nhanh chóng cho mình chị nha. Hay chị muốn hỗ trợ qua tin nhắn ạ?
+
+B4: ĐÁNH GIÁ RĂNG
+Tình trạng răng khấp khểnh thì hoàn toàn khắc phục được 100% khi niềng khay trong suốt bên em.
+Tình trạng răng thưa ở mức độ nhẹ của mình thì hoàn toàn khắc phục được khi niềng khay ạ.
+Răng mình từng niềng rồi giờ mình niềng lại bằng khay thì hoàn toàn khắc phục được. Tùy vào tình trạng răng chạy thì khi lên phác đồ sẽ có kết quả điều trị.
+
+B5: ƯU ĐIỂM KHAY
+Ưu điểm của niềng khay trong suốt độc quyền bên em: HẠN CHẾ NHỔ RĂNG, ít đau, không cợm cấn khó chịu, không nhiệt lỡ miệng hay hôi miệng. Ăn uống thuận tiện, không sợ vướng víu khi ăn, dễ dàng vệ sinh khay. Tiết kiệm thời gian không cần tái khám nhiều lần. Ở tỉnh hay đi du học vẫn niềng được vì có app tích hợp điện thoại theo dõi niềng từ xa.
+
+B6: BÁO GIÁ
+Chi phí niềng khay trong suốt Dr.Wondersmile có 2 gói: Gói niềng cơ bản 33 triệu (phù hợp răng thưa nhẹ, niềng lại, thời gian dưới 6 tháng). Gói niềng chuyên sâu 65 triệu ƯU ĐÃI còn 45 Triệu (phù hợp răng trung bình, khó, thời gian trên 6 tháng).
+Giá niềng khay trong suốt dao động từ 33 triệu đến 65 triệu. Gói 65 TRIỆU đang ưu đãi TRỌN GÓI còn 45 TRIỆU.
+
+B7: ĐẶT CÂU HỎI GIAO TIẾP
+Mình ở HCM hay ở đâu?
+Khi lên phác đồ răng mình bị nhẹ niềng dưới 6 tháng thì mình niềng ở gói 33 triệu. Còn mình niềng trên 6 tháng thì mình niềng ở gói 45 triệu.
+
+B8: VIDEO MÔ PHỎNG
+Video mô phỏng tình trạng răng khi lên phác đồ 3D. Từ video mình thấy được răng sẽ di chuyển như thế nào khi niềng. Phác đồ còn có cụ thể chính xác số ngày hoàn thành và mọi công đoạn điều trị.
+Bên em đang độc quyền CÔNG NGHỆ NIỀNG KHAY BAN ĐÊM chỉ đeo 10 tiếng. Giúp thời gian đeo niềng ít, thuận tiện làm việc.
+
+B9: ƯU ĐÃI VÀ HẸN
+Đặt hẹn online nhận ngay gói QUÀ TẶNG trị giá 5 Triệu Đồng: Tặng 1 tăm nước cao cấp + Gói TẨY TRẮNG RĂNG NGỌC TRAI.
+Thăm khám tư vấn MIỄN PHÍ, thời gian khoảng 30p. Nhận lịch thăm khám từ 9h đến 18h30 tất cả các ngày trong tuần (làm việc xuyên trưa).
+Không biết hôm nay mình ghé bên em thăm khám tiện không ạ?
+
+B10: XIN THÔNG TIN ĐẶT HẸN
+Chị gửi em xin SỐ ĐIỆN THOẠI và tên để em tạo lịch hẹn trên hệ thống nha khoa bên em ạ?
+
+B11: CHỐT HẸN
+XÁC NHẬN ĐẶT HẸN THÀNH CÔNG TẠI DR.WONDERSMILE. Hẹn gặp chị tại nha khoa vào ngày hẹn. Trước giờ hẹn thì phòng khám sẽ liên hệ xác nhận lịch hẹn.

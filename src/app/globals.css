@@ -1,0 +1,466 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Background colors - darker like reference */
+  --bg-primary: #121214;
+  --bg-surface: #1a1a1e;
+  --bg-elevated: #242428;
+  --bg-hover: #2a2a30;
+  --bg-card: #1e1e22;
+  
+  /* Border colors */
+  --border: #2d2d32;
+  --border-hover: #3d3d44;
+  --border-active: #f97316;
+  
+  /* Text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-muted: #52525b;
+  
+  /* Accent colors - Orange primary like reference */
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-glow: rgba(249, 115, 22, 0.2);
+  --accent-muted: rgba(249, 115, 22, 0.1);
+  
+  /* Status colors */
+  --accent-green: #22c55e;
+  --accent-green-muted: rgba(34, 197, 94, 0.15);
+  --accent-red: #ef4444;
+  --accent-red-muted: rgba(239, 68, 68, 0.15);
+  --accent-yellow: #eab308;
+  --accent-yellow-muted: rgba(234, 179, 8, 0.15);
+  --accent-blue: #3b82f6;
+  --accent-blue-muted: rgba(59, 130, 246, 0.15);
+  --accent-purple: #a855f7;
+  --accent-purple-muted: rgba(168, 85, 247, 0.15);
+  --accent-cyan: #06b6d4;
+  --accent-cyan-muted: rgba(6, 182, 212, 0.15);
+  --accent-pink: #ec4899;
+  --accent-pink-muted: rgba(236, 72, 153, 0.15);
+  
+  /* Canvas */
+  --canvas-bg: #121214;
+  --canvas-dot: #2a2a30;
+  
+  /* Panels */
+  --panel-bg: #161618;
+  --panel-border: #2d2d32;
+  
+  /* Sidebar */
+  --sidebar-bg: #121214;
+  --sidebar-icon: #71717a;
+  --sidebar-icon-active: #f97316;
+  
+  /* Nodes */
+  --node-bg: #1e1e22;
+  --node-border: #2d2d32;
+  --node-border-hover: #3d3d44;
+  --node-header-bg: #242428;
+}
+
+@layer base {
+  body {
+    @apply antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+@layer components {
+  /* Icon Sidebar (left most) */
+  .icon-sidebar {
+    @apply w-12 flex flex-col items-center py-3 gap-1;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--panel-border);
+  }
+  
+  .icon-sidebar-item {
+    @apply w-9 h-9 flex items-center justify-center rounded-lg transition-all cursor-pointer;
+    color: var(--sidebar-icon);
+  }
+  .icon-sidebar-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+  }
+  .icon-sidebar-item.active {
+    background: var(--accent-muted);
+    color: var(--accent);
+  }
+
+  /* Node Palette / Library */
+  .node-palette {
+    @apply w-72 flex flex-col h-full overflow-hidden;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--panel-border);
+  }
+  
+  .node-palette-header {
+    @apply px-4 py-3 flex items-center justify-between;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  
+  .node-palette-search {
+    @apply w-full px-3 py-2 rounded-lg text-sm outline-none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .node-palette-search::placeholder {
+    color: var(--text-muted);
+  }
+  .node-palette-search:focus {
+    border-color: var(--accent);
+  }
+  
+  .node-category {
+    @apply px-4 py-2;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  
+  .node-category-title {
+    @apply flex items-center justify-between py-2 cursor-pointer;
+    color: var(--text-secondary);
+  }
+  .node-category-title:hover {
+    color: var(--text-primary);
+  }
+  
+  .node-item {
+    @apply flex items-center gap-2.5 px-2 py-2 rounded-lg cursor-grab transition-all;
+    color: var(--text-secondary);
+  }
+  .node-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+  .node-item:active {
+    cursor: grabbing;
+  }
+  
+  .node-item-icon {
+    @apply w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0;
+  }
+
+  /* Node Cards on Canvas */
+  .node-card {
+    @apply rounded-lg text-xs;
+    min-width: 280px;
+    max-width: 380px;
+    background: var(--node-bg);
+    border: 1px solid var(--node-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .node-card:hover {
+    border-color: var(--node-border-hover);
+  }
+
+  .node-card button,
+  .node-card input,
+  .node-card textarea,
+  .node-card select,
+  .node-card a {
+    pointer-events: all;
+  }
+
+  .node-header {
+    @apply flex items-center gap-2.5 px-4 py-3 font-medium text-[13px];
+    background: var(--node-header-bg);
+    border-radius: 7px 7px 0 0;
+    color: var(--text-primary);
+  }
+  
+  .node-header-icon {
+    @apply w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0;
+  }
+
+  .node-body {
+    @apply px-4 py-3 space-y-3;
+  }
+
+  .node-body button,
+  .node-body select,
+  .node-body textarea,
+  .node-body input,
+  .node-body a {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .node-row {
+    @apply flex items-center justify-between text-[12px];
+  }
+  
+  .node-label {
+    color: var(--text-tertiary);
+  }
+  
+  .node-value {
+    color: var(--text-secondary);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .node-field {
+    @apply w-full px-3 py-2 rounded-md text-[12px] outline-none transition-all;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .node-field::placeholder {
+    color: var(--text-muted);
+  }
+  .node-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+  
+  .node-code-block {
+    @apply px-3 py-2.5 rounded-md text-[11px] font-mono leading-relaxed;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  
+  .node-output-btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium;
+    background: var(--accent);
+    color: white;
+  }
+  .node-output-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .node-btn {
+    @apply w-full px-3 py-2 rounded-md text-[12px] font-medium transition-all;
+  }
+
+  .node-btn-primary {
+    @apply node-btn text-white;
+    background: var(--accent);
+  }
+  .node-btn-primary:hover {
+    background: var(--accent-hover);
+  }
+
+  .node-btn-secondary {
+    @apply node-btn;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .node-btn-secondary:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+  
+  /* Flow Settings Panel (right side) */
+  .settings-panel {
+    @apply w-72 flex flex-col h-full overflow-hidden;
+    background: var(--panel-bg);
+    border-left: 1px solid var(--panel-border);
+  }
+  
+  .settings-section {
+    @apply px-4 py-3;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  
+  .settings-section-header {
+    @apply flex items-center justify-between mb-3;
+  }
+  
+  .settings-section-title {
+    @apply text-[13px] font-medium;
+    color: var(--text-primary);
+  }
+  
+  .settings-row {
+    @apply flex items-center justify-between py-2;
+  }
+  
+  .settings-label {
+    @apply text-[12px];
+    color: var(--text-tertiary);
+  }
+  
+  .settings-value {
+    @apply text-[12px];
+    color: var(--text-secondary);
+  }
+  
+  .settings-input {
+    @apply px-3 py-2 rounded-md text-[12px] w-full outline-none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .settings-input:focus {
+    border-color: var(--accent);
+  }
+  
+  /* Toggle Switch */
+  .toggle-switch {
+    @apply relative w-9 h-5 rounded-full cursor-pointer transition-colors;
+    background: var(--bg-elevated);
+  }
+  .toggle-switch.active {
+    background: var(--accent);
+  }
+  .toggle-switch::after {
+    content: '';
+    @apply absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform;
+  }
+  .toggle-switch.active::after {
+    transform: translateX(16px);
+  }
+  
+  /* Status Badge */
+  .status-badge {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium;
+  }
+  .status-badge.active {
+    background: var(--accent-green-muted);
+    color: var(--accent-green);
+  }
+  .status-badge.inactive {
+    background: var(--bg-elevated);
+    color: var(--text-tertiary);
+  }
+
+  .panel-overlay {
+    @apply fixed inset-y-0 right-0 w-80 z-50 overflow-y-auto;
+    background: var(--bg-surface);
+    border-left: 1px solid var(--border);
+  }
+
+  .toolbar {
+    @apply h-12 flex items-center px-4 justify-between;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .mini-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium;
+  }
+
+  .node-status-dot {
+    @apply w-2 h-2 rounded-full;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+  }
+}
+
+/* React Flow Canvas */
+.react-flow__background {
+  background: var(--canvas-bg) !important;
+}
+
+.react-flow__background pattern circle {
+  fill: var(--canvas-dot) !important;
+}
+
+.react-flow__edge-path {
+  stroke: var(--border-hover) !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__edge-path:hover {
+  stroke: var(--accent) !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__edge {
+  cursor: pointer;
+}
+
+.react-flow__edge-interaction {
+  stroke-width: 20 !important;
+  stroke: transparent !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--accent) !important;
+  stroke-width: 2 !important;
+}
+
+.react-flow__controls {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.react-flow__controls button {
+  background: transparent !important;
+  color: var(--text-tertiary) !important;
+  border-bottom: 1px solid var(--border) !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.react-flow__controls button:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+.react-flow__controls button svg {
+  fill: currentColor !important;
+}
+
+.react-flow__minimap {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+/* Node selection */
+.react-flow__node.selected .node-card {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-glow), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Handle */
+.react-flow__handle {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--node-bg) !important;
+  background: var(--accent) !important;
+  transition: transform 0.15s;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Connection line */
+.react-flow__connection-path {
+  stroke: var(--accent) !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: 6 4 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
