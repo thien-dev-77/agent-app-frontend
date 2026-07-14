@@ -42,10 +42,11 @@ export default function HomePage() {
     
     let fullPrompt = item.prompt_excerpt || '';
     
-    // Lấy full prompt từ API
+    // Lấy full prompt từ API backend
     if (item.share_id) {
       try {
-        const res = await fetch(`/api/gallery/prompt?share_id=${item.share_id}`);
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+        const res = await fetch(`${API_URL}/gallery/prompt?share_id=${item.share_id}`);
         const data = await res.json();
         if (data.prompt) {
           fullPrompt = data.prompt;
@@ -70,8 +71,9 @@ export default function HomePage() {
     setLoading(true);
     
     try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
       const res = await fetch(
-        `/api/gallery?limit=24&offset=${currentOffset}&sort=latest&model=gpt-image`
+        `${API_URL}/gallery?limit=24&offset=${currentOffset}&sort=latest&model=gpt-image`
       );
       const data: ApiResponse = await res.json();
       
