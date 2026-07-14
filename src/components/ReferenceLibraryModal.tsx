@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Trash2, Check, Loader2, Upload, Search } from 'lucide-react';
 import { getReferenceImages, uploadReferenceImage, deleteReferenceImage } from '@/lib/api';
 import { useDropzone } from 'react-dropzone';
@@ -98,10 +99,15 @@ export default function ReferenceLibraryModal({ onClose, selectedUrls = [], onSe
     !search || (img.label || img.original_name || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
+  // Portal để render ra ngoài ReactFlow DOM (tránh bị clip/hidden)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
+  const modal = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.85)' }}
+      className="fixed inset-0 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.85)', zIndex: 99999 }}
       onClick={onClose}
     >
       <div
@@ -256,4 +262,6 @@ export default function ReferenceLibraryModal({ onClose, selectedUrls = [], onSe
       </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }
