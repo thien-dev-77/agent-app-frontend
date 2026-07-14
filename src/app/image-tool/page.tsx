@@ -252,15 +252,21 @@ function ImageToolContent() {
       if (!response.ok) throw new Error('Failed to generate');
       
       const result = await response.json();
+      console.log('Generate result:', result);
       
-      if (result.result_url) {
-        setGeneratedImages([result.result_url]);
+      // API trả về result_url
+      const imageUrl = result.result_url;
+      
+      if (imageUrl) {
+        setGeneratedImages([imageUrl]);
         // Lưu vào history
         setHistoryImages(prev => [{
-          url: result.result_url,
+          url: imageUrl,
           prompt: prompt.slice(0, 100) + (prompt.length > 100 ? '...' : ''),
           createdAt: new Date().toISOString(),
         }, ...prev]);
+        // Chuyển sang tab Lịch sử để hiển thị ảnh vừa tạo
+        setActiveTab('history');
         toast.success('Tạo ảnh thành công!', { id: 'generating' });
       } else {
         throw new Error('No result URL');
