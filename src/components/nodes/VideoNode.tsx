@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import { Video, Loader2, Play, Download } from 'lucide-react';
+import { Video, Loader2, Play, Download, X } from 'lucide-react';
 import NodeWrapper from './NodeWrapper';
 
 interface VideoNodeProps {
@@ -20,101 +20,119 @@ interface VideoNodeProps {
 function VideoNode({ data }: VideoNodeProps) {
   const { imageUrl, generating = false, result, onGenerate, onDelete, canGenerate = false } = data;
   const [localPrompt, setLocalPrompt] = useState(data.prompt || '');
+  const [showVideo, setShowVideo] = useState(false);
 
-  const canRun = canGenerate || localPrompt.trim().length > 0 || !!imageUrl;
+  const isCompleted = result?.status === 'completed' && result?.video_url;
 
   return (
     <NodeWrapper onDelete={onDelete}>
-      <div className="node-card" style={{ width: 250 }}>
-        <div className="node-header ">
-          <Video className="w-3.5 h-3.5" />
-          <span className="text-gray-200">Generate Video</span>
-          {generating && <Loader2 className="w-3 h-3 ml-auto animate-spin" />}
+      <div className="node-card nowheel" style={{ width: 260, background: '#141414', border: '1px solid #2a2a2a' }}>
+        {/* Header */}
+        <div className="node-header" style={{ background: '#1a1a1a', borderBottom: '1px solid #2a2a2a', padding: '8px 12px' }}>
+          <Video className="w-3.5 h-3.5 text-rose-400" />
+          <span className="text-gray-200 font-semibold text-[11px]">Generate Video</span>
+          {generating && <Loader2 className="w-3.5 h-3.5 ml-auto animate-spin text-rose-400" />}
+          {isCompleted && <span className="ml-auto text-[10px] text-emerald-400">✓ Done</span>}
         </div>
-        <div className="node-body space-y-2">
-          {/* Prompt */}
-          <div>
-            <label className="text-[10px] text-gray-500 block mb-0.5">Video prompt</label>
-            <textarea
-              value={localPrompt}
-              onChange={e => setLocalPrompt(e.target.value)}
-              className="node-field resize-none text-[11px]"
-              rows={2}
-              placeholder="Mô tả video muốn tạo..."
-            />
-          </div>
 
-          {/* Input image */}
+        <div className="p-0">
+          {/* Textarea prompt */}
+          <textarea
+            value={localPrompt}
+            onChange={e => setLocalPrompt(e.target.value)}
+            className="w-full bg-transparent text-[11px] text-gray-300 leading-relaxed outline-none resize-none px-3 py-2.5"
+            style={{ minHeight: 64, borderBottom: '1px solid #1e1e1e' }}
+            placeholder="Mô tả video muốn tạo..."
+            onPointerDown={e => e.stopPropagation()}
+          />
+
+          {/* Input image preview */}
           {imageUrl && (
-            <div>
-              <label className="text-[10px] text-gray-500 block mb-0.5">Input từ Generate</label>
-              <div className="w-full h-14 rounded overflow-hidden border border-[var(--node-border)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imageUrl} alt="Input" className="w-full h-full object-cover" />
+            <div className="relative overflow-hidden" style={{ maxHeight: 120, borderBottom: '1px solid #1e1e1e' }}>
+              <img src={imageUrl} alt="Input" className="w-full object-cover" style={{ maxHeight: 120 }} />
+              <div className="absolute inset-0 flex items-end p-2" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
+                <span className="text-[9px] text-gray-400">Input từ Generate node</span>
               </div>
             </div>
           )}
 
-          {/* Info */}
-          <div className="flex gap-2 text-[10px]">
-            <span className="bg-white/5 text-rose-600 px-1.5 py-0.5 rounded font-mono">Gemini Flash</span>
-            <span className="bg-white/5 text-gray-500 px-1.5 py-0.5 rounded">5-10s</span>
-          </div>
-
-          {/* Run button */}
-          <button
-            onPointerDown={e => e.stopPropagation()}
-            onClick={() => onGenerate?.(localPrompt)}
-            disabled={generating}
-            className={`node-btn-primary flex items-center justify-center gap-1.5 ${generating ? 'opacity-70' : ''}`}
-            style={{ background: generating ? '#9f1239' : '#e11d48' }}
-          >
-            {generating ? (
-              <><Loader2 className="w-3 h-3 animate-spin" /> Đang tạo video...</>
-            ) : (
-              <><Play className="w-3 h-3" /> Tạo Video</>
-            )}
-          </button>
-
-          {/* Result */}
-          {result && (
-            <div className={`rounded p-1.5 ${
-              result.status === 'completed' ? 'bg-green-50 border border-green-200' : result.status === 'failed' ? 'bg-red-50 border border-red-200' : 'bg-white/5 border border-[var(--node-border)]'
-            }`}>
-              {result.status === 'completed' && result.video_url ? (
-                <div className="space-y-1">
-                  <div className="relative w-full h-24 rounded overflow-hidden bg-black">
-                    <video src={result.video_url} className="w-full h-full object-cover" muted />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <Play className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex gap-2 justify-center">
-                    <a href={result.video_url} target="_blank" rel="noreferrer" className="text-[10px] text-rose-600 hover:underline flex items-center gap-0.5">
-                      <Play className="w-2.5 h-2.5" /> Xem
-                    </a>
-                    <a href={result.video_url} download className="text-[10px] text-gray-400 hover:underline flex items-center gap-0.5">
-                      <Download className="w-2.5 h-2.5" /> Tải
-                    </a>
-                  </div>
-                </div>
-              ) : result.status === 'failed' ? (
-                <p className="text-[10px] text-red-600">❌ {result.error_message || 'Thất bại'}</p>
-              ) : (
-                <p className="text-[10px] text-blue-600 flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Đang xử lý video...
-                </p>
-              )}
+          {/* Generating */}
+          {generating && (
+            <div className="m-2 rounded-xl py-6 text-center" style={{ background: 'rgba(244,63,94,0.05)', border: '1px solid rgba(244,63,94,0.15)' }}>
+              <Loader2 className="w-6 h-6 text-rose-400 animate-spin mx-auto" />
+              <p className="text-[10px] text-rose-300 mt-2 font-medium">Đang tạo video...</p>
+              <p className="text-[9px] text-gray-600 mt-0.5">Gemini Flash · 5-10s</p>
             </div>
           )}
 
-          {!canRun && !generating && !result && (
-            <p className="text-[10px] text-gray-500 text-center">Nhập prompt hoặc kết nối từ Generate</p>
+          {/* Video result */}
+          {isCompleted && !generating && (
+            <div>
+              <div
+                className="relative group cursor-pointer overflow-hidden"
+                onClick={() => setShowVideo(true)}
+                onPointerDown={e => e.stopPropagation()}
+              >
+                <video src={result!.video_url} className="w-full object-cover" muted style={{ maxHeight: 200 }} />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="flex gap-2">
+                    <button className="p-2.5 rounded-xl text-white" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
+                      <Play className="w-4 h-4" />
+                    </button>
+                    <a href={result!.video_url} download onClick={e => e.stopPropagation()} className="p-2.5 rounded-xl text-white" style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
+                      <Download className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
+
+          {/* Failed */}
+          {result?.status === 'failed' && (
+            <div className="m-2 rounded-xl py-4 text-center" style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.05)' }}>
+              <p className="text-[11px] text-red-400">❌ {result.error_message || 'Thất bại'}</p>
+            </div>
+          )}
+
+          {/* Run button */}
+          <div className="p-2">
+            <button
+              onPointerDown={e => e.stopPropagation()}
+              onClick={() => onGenerate?.(localPrompt)}
+              disabled={generating}
+              className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold text-white transition disabled:opacity-60"
+              style={{ background: generating ? '#9f1239' : 'linear-gradient(135deg, #e11d48, #be123c)' }}
+            >
+              {generating ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Đang tạo...</>
+              ) : (
+                <><Play className="w-3.5 h-3.5" /> Tạo Video</>
+              )}
+            </button>
+          </div>
         </div>
-        <Handle type="target" position={Position.Left} />
-        <Handle type="source" position={Position.Right} className="!bg-white/50" />
+
+        <Handle type="target" position={Position.Left} style={{ background: '#f43f5e' }} />
+        <Handle type="source" position={Position.Right} style={{ background: '#f43f5e' }} />
       </div>
+
+      {/* Video fullscreen */}
+      {showVideo && isCompleted && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.95)' }}
+          onClick={() => setShowVideo(false)}
+          onPointerDown={e => e.stopPropagation()}
+        >
+          <div className="relative max-w-[80vw]">
+            <video src={result!.video_url} className="max-w-full max-h-[80vh] rounded-xl" controls autoPlay />
+            <button onClick={() => setShowVideo(false)} className="absolute top-3 right-3 p-2 rounded-full text-white" style={{ background: 'rgba(0,0,0,0.6)' }}>
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </NodeWrapper>
   );
 }
