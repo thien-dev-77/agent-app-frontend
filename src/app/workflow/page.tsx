@@ -148,7 +148,9 @@ function WorkflowCanvas() {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [referenceFiles, setReferenceFiles] = useState<File[]>([]);
+  const [referenceLibraryUrls, setReferenceLibraryUrls] = useState<string[]>([]);
   const [imageNodeFiles, setImageNodeFiles] = useState<Record<string, File[]>>({});
+  const [imageNodeLibraryUrls, setImageNodeLibraryUrls] = useState<Record<string, string[]>>({});
   const [prompt, setPrompt] = useState('');
   const [sidePanel, setSidePanel] = useState<'brand' | 'template' | null>(null);
 
@@ -252,8 +254,12 @@ function WorkflowCanvas() {
   selectedTemplateRef.current = selectedTemplate;
   const referenceFilesRef = useRef(referenceFiles);
   referenceFilesRef.current = referenceFiles;
+  const referenceLibraryUrlsRef = useRef(referenceLibraryUrls);
+  referenceLibraryUrlsRef.current = referenceLibraryUrls;
   const imageNodeFilesRef = useRef(imageNodeFiles);
   imageNodeFilesRef.current = imageNodeFiles;
+  const imageNodeLibraryUrlsRef = useRef(imageNodeLibraryUrls);
+  imageNodeLibraryUrlsRef.current = imageNodeLibraryUrls;
 
   const canRun = prompt.trim().length > 0 || nodes.some((n) => n.type === 'aiprompt');
 
@@ -263,6 +269,8 @@ function WorkflowCanvas() {
     const currentTemplate = selectedTemplateRef.current;
     const currentFiles = referenceFilesRef.current;
     const currentImageFiles = imageNodeFilesRef.current;
+    const referenceLibraryUrls = referenceLibraryUrlsRef.current;
+    const imageNodeLibraryUrls = imageNodeLibraryUrlsRef.current;
 
     // Cho phép chạy nếu có node aiprompt (AI sẽ tự tạo prompt) hoặc có prompt node với text
     const hasAIPromptNode = nodes.some((n) => n.type === 'aiprompt');
@@ -348,15 +356,21 @@ function WorkflowCanvas() {
               nodePrompt = nodeResults[inp.id];
             }
           } else if (inp.type === 'image') {
-            // Upload files từ image node
+            // Upload files từ image node + dùng libraryUrls trực tiếp
             const files = currentImageFiles[inp.id] || [];
-            console.log(`[Flow] Image node ${inp.id}: ${files.length} files`);
+            const libUrls = imageNodeLibraryUrls[inp.id] || [];
+            console.log(`[Flow] Image node ${inp.id}: ${files.length} files, ${libUrls.length} library URLs`);
+            // Library URLs đã có trên server, dùng thẳng
+            refImages.push(...libUrls);
             for (const file of files) {
               const { url } = await uploadFile(file);
               refImages.push(url);
               console.log(`[Flow] Uploaded image: ${url.slice(0, 60)}`);
             }
           } else if (inp.type === 'references') {
+            // Library URLs đã có trên server
+            const libUrls = referenceLibraryUrls || [];
+            refImages.push(...libUrls);
             for (const file of currentFiles) {
               const { url } = await uploadFile(file);
               refImages.push(url);
@@ -640,10 +654,24 @@ function WorkflowCanvas() {
           return { ...node, data: { templates, selectedTemplate, onSelect: setSelectedTemplate, onCreateNew: () => setSidePanel('template'), onDelete: deleteHandler } };
         }
         if (node.type === 'references') {
-          return { ...node, data: { files: referenceFiles, onFilesAdd: (f: File[]) => setReferenceFiles(prev => [...prev, ...f]), onFileRemove: (i: number) => setReferenceFiles(prev => prev.filter((_, idx) => idx !== i)), onDelete: deleteHandler } };
+          return { ...node, data: { 
+            files: referenceFiles, 
+            libraryUrls: referenceLibraryUrls,
+            onFilesAdd: (f: File[]) => setReferenceFiles(prev => [...prev, ...f]), 
+            onFileRemove: (i: number) => setReferenceFiles(prev => prev.filter((_, idx) => idx !== i)), 
+            onLibraryUrlsChange: (urls: string[]) => setReferenceLibraryUrls(urls),
+            onDelete: deleteHandler 
+          } };
         }
         if (node.type === 'image') {
-          return { ...node, data: { files: imageNodeFiles[node.id] || [], onFilesAdd: (f: File[]) => setImageNodeFiles(prev => ({ ...prev, [node.id]: [...(prev[node.id] || []), ...f] })), onFileRemove: (i: number) => setImageNodeFiles(prev => ({ ...prev, [node.id]: (prev[node.id] || []).filter((_, idx) => idx !== i) })), onDelete: deleteHandler } };
+          return { ...node, data: { 
+            files: imageNodeFiles[node.id] || [], 
+            libraryUrls: imageNodeLibraryUrls[node.id] || [],
+            onFilesAdd: (f: File[]) => setImageNodeFiles(prev => ({ ...prev, [node.id]: [...(prev[node.id] || []), ...f] })), 
+            onFileRemove: (i: number) => setImageNodeFiles(prev => ({ ...prev, [node.id]: (prev[node.id] || []).filter((_, idx) => idx !== i) })),
+            onLibraryUrlsChange: (urls: string[]) => setImageNodeLibraryUrls(prev => ({ ...prev, [node.id]: urls })),
+            onDelete: deleteHandler 
+          } };
         }
         if (node.type === 'prompt') {
           return { ...node, data: { prompt, onChange: setPrompt, onDelete: deleteHandler } };
@@ -662,7 +690,7 @@ function WorkflowCanvas() {
       })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brands, templates, selectedBrand, selectedTemplate, referenceFiles, imageNodeFiles, prompt, generating, results, numImages, videoPrompt, generatingVideo, videoResult, textNotes]);
+  }, [brands, templates, selectedBrand, selectedTemplate, referenceFiles, referenceLibraryUrls, imageNodeFiles, imageNodeLibraryUrls, prompt, generating, results, numImages, videoPrompt, generatingVideo, videoResult, textNotes]);
 
   const nodeTypes = useMemo(() => ({
     brand: BrandNode,

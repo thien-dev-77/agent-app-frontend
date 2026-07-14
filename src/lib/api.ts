@@ -317,4 +317,25 @@ export async function addKnowledgeText(content: string, title?: string, category
   return data;
 }
 
+// Reference Images Library
+export async function getReferenceImages(): Promise<{ id: string; url: string; original_name: string | null; label: string | null; tags: string[] | null; created_at: string }[]> {
+  const { data } = await api.get('/reference-images');
+  return data;
+}
+
+export async function uploadReferenceImage(file: File, label?: string, tags?: string[]): Promise<{ id: string; url: string; label: string | null }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (label) formData.append('label', label);
+  if (tags?.length) formData.append('tags', tags.join(','));
+  const { data } = await api.post('/reference-images/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+}
+
+export async function deleteReferenceImage(id: string): Promise<void> {
+  await api.delete(`/reference-images/${id}`);
+}
+
 export default api;
