@@ -1,6 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const shareId = searchParams.get('share_id');
 
@@ -16,17 +19,18 @@ export async function GET(request: Request) {
           'Accept': 'application/json',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
+        cache: 'no-store',
       }
     );
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Failed to fetch prompt' }, { status: res.status });
+      return NextResponse.json({ error: 'Failed to fetch prompt', prompt: '' }, { status: 200 });
     }
 
     const data = await res.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Proxy error:', error);
-    return NextResponse.json({ error: 'Failed to fetch prompt' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch prompt', prompt: '' }, { status: 200 });
   }
 }
