@@ -67,8 +67,6 @@
   body {
     @apply antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    height: 100vh;
-    overflow: hidden;
     background: var(--bg-primary);
     color: var(--text-primary);
   }
